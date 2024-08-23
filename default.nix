@@ -1,5 +1,16 @@
-{ stdenvNoCC, fetchzip, zlib, libgcc, makeDesktopItem, copyDesktopItems
-, buildFHSEnv, libGL, libXrandr, alsa-lib, udev }:
+{
+  alsa-lib,
+  buildFHSEnv,
+  copyDesktopItems,
+  fetchzip,
+  libGL,
+  libXrandr,
+  libgcc,
+  makeDesktopItem,
+  stdenvNoCC,
+  udev,
+  zlib,
+}:
 let
   pname = "nsmb-mvl";
   version = "1.7.1.0-beta";
@@ -14,14 +25,14 @@ let
 
     installPhase = ''
       runHook preInstall
-      mkdir -p $out
-      cp -r $src $out/.nsmb-mvl
+      mkdir -p $out/opt
+      cp -r $src $out/opt/nsmb-mvl
 
       mkdir -p $out/share/icons
       cp $src/linux_Data/Resources/UnityPlayer.png $out/share/icons/nsmb-mvl.png
 
       mkdir -p $out/bin
-      ln -s $out/.nsmb-mvl/linux.x86_64 $out/bin/nsmb-mvl
+      ln -s $out/opt/nsmb-mvl/linux.x86_64 $out/bin/nsmb-mvl
       runHook postInstall
     '';
 
@@ -34,17 +45,29 @@ let
         comment = "A unity-standalone 2-10 player remake of the Mario vs. Luigi gamemode from the New Super Mario Bros DS download game.";
         type = "Application";
         categories = [ "Game" ];
-        keywords = [ "NSMB" "mario" ];
+        keywords = [
+          "NSMB"
+          "mario"
+        ];
       })
     ];
 
     nativeBuildInputs = [ copyDesktopItems ];
   };
-in buildFHSEnv {
-  inherit pname version;
+in
+buildFHSEnv {
+  inherit version;
+  pname = "${pname}";
 
-  targetPkgs = pkgs: ([ udev alsa-lib libgcc zlib libGL libXcursor libXrandr ]);
-  multiPkgs = pkgs: ([ nsmb-mvl alsa-lib ]);
+  targetPkgs = pkgs: ([
+    alsa-lib
+    libGL
+    libXrandr
+    libgcc
+    udev
+    zlib
+  ]);
+  multiPkgs = pkgs: ([ nsmb-mvl ]);
 
   runScript = "nsmb-mvl";
 
@@ -54,4 +77,3 @@ in buildFHSEnv {
     ln -sf ${nsmb-mvl}/share/icons $out/share
   '';
 }
-
